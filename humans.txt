@@ -3,13 +3,14 @@
 
 # TEAM
 
-    <name> -- <role> -- <twitter>
+    Andreas Eldh -- Everything -- @eldh
 
 # THANKS
 
-    <name>
+    Dan Rubin and Sebastian de With for giving me the idea.
+    Instagram, Flickr and 500px for providing kickass api:s.
 
 # TECHNOLOGY COLOPHON
 
     HTML5, CSS3
-    Normalize.css, jQuery, Modernizr
+    Normalize.css, jQuery, Modernizr, coffeescript, sass, bourbon, handlebars, icomoon, swipejs, html5boilerplate.
