@@ -1,0 +1,38 @@
+.main-logo {
+	display: inline-block;
+	position: relative;
+	padding-top: 96px;
+	&:before {
+		@extend %icon;
+		@extend .icon-logo:before;
+		position: absolute;
+		color: $brand-color;
+		width: 64px;
+		height: 64px;
+		background-size: cover;
+		top: 0;
+		right: 50%;
+		margin-right: -32px;		
+	}
+}
+.footer-logo {
+	display: inline-block;
+	position: relative;
+	padding-top: 96px;
+	font-size: 32px;
+	line-height: 32px;
+	font-weight: 100;
+	text-transform: uppercase;
+	&:before {
+		@extend %icon;
+		@extend .icon-logo:before;
+		font-size: 64px;
+		position: absolute;
+		width: 64px;
+		height: 64px;
+		background-size: cover;
+		top: 0;
+		right: 50%;
+		margin-right: -32px;		
+	}
+}

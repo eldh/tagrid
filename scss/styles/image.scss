@@ -1,0 +1,46 @@
+.images-wrapper {
+	max-width: 900px;
+	margin: 0 auto;
+	padding-bottom: 10px;
+	min-height: 100%;
+}
+
+.image {
+	display: inline-block;
+	width: 140px;
+	margin: 5px 10px;
+	cursor: pointer;
+	@include clearfix;
+}
+.image__img {
+	opacity: 0;
+	@include transform(translateZ(0));
+	@include transition(opacity 2s ease);
+	&.loaded {
+		opacity: 1;
+	}
+}
+.image__caption {
+	display: none;
+	opacity: 0;
+	@include transition(opacity 0.3s ease);
+	.image:hover & {
+		opacity: 0.5;
+	}
+}
+
+.image__extra {
+	display: none;
+	height: 0;
+	overflow: visible;
+}
+.image__service {
+	@extend %icon;
+}
+.image__service--instagram {
+	@extend .icon-instagram;
+}.image__service--flickr {
+	@extend .icon-flickr;
+}.image__service--px {
+	@extend .icon-px;
+}

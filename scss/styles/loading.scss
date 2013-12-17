@@ -1,0 +1,27 @@
+/**
+ * (C)Leanest CSS spinner ever
+ */
+
+@include keyframes(spin) {
+	0% { @include transform(rotate(0deg)); }
+	50% { @include transform(rotate(100deg)); }
+	100% { @include transform(rotate(90deg)); }
+}
+
+.loading {
+	@extend %icon;
+	@extend .icon-logo;
+	position: absolute;
+	display: inline-block;
+	color: #fff;
+	font-size: 32px;
+	width: 32px;
+	height: 32px;
+	background-size: cover;
+	top: 0;
+	right: 50%;
+	margin-right: -16px;		
+	margin-top: -16px;		
+	position: relative;
+	@include animation(spin .7s ease infinite);
+}

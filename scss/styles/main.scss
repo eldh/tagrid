@@ -1,0 +1,41 @@
+* {
+	box-sizing: border-box;
+}
+
+html {
+	height: 100%;
+	margin: 0; 
+}
+
+body {
+	position: relative;
+	margin: 0;
+	background: #fefefa;
+	min-height: 100%;
+	opacity: 0;
+	@include transition(opacity .5s linear);
+	&.scrolling {
+		pointer-events: none;
+	}
+	&.state-album {
+	}
+	&.state-blank {
+	}
+	&.state-album,
+	&.state-blank {
+		opacity: 1;
+	}
+}
+.main-content {
+	text-align: center;
+	min-height: 100%;
+}
+.wrapper {
+	padding-bottom: 400px; //footer height + 20
+}
+.state-blank .wrapper {
+	padding-bottom: 20px;
+}
+a, a:link {
+	text-decoration: none;
+}

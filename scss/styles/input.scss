@@ -1,0 +1,52 @@
+.tag-input {
+	font-size: 1.375rem;
+	padding: 64px 0;
+	font-weight: 400;
+}
+.tag-input__input,
+.tag-input__submit  {
+	display: inline-block;
+	padding: 8px 16px;
+	line-height: 1.5em;
+	border: 1px solid $brand-color;
+	border-radius: 4px;	
+	font-family: $font;
+	font-size: 1.375rem;
+	letter-spacing: 2px;
+	outline: 0;
+}
+.btn {
+	display: inline-block;
+	padding: 8px 16px;
+	line-height: 1.5em;
+	font-weight: 400;
+	color: #fff;
+	background-color: $brand-color;
+	border: 0;
+	border-radius: 4px;	
+	cursor: pointer;
+	text-shadow: 0 1px rgba(0,0,0,0.2);
+	box-shadow: 0 0 15px rgba(255,255,255,0.35) inset, 0 -1px 0 rgba(0,0,0,0.2) inset;
+	-webkit-appearance: none;
+	@include transition(background-color 0.3s ease-in-out);
+	&:hover {
+		background-color: $brand-color + 30;
+	}
+	&:active {
+		box-shadow: none;
+	}	
+}
+.btn--quiet {
+	background-color: #fff;
+	border: 2px $brand-color solid;
+	box-shadow: none;
+	text-shadow: none;
+	color: $brand-color;
+	@include transition(background-color 0.2s ease-in-out);
+	&:hover {
+		background-color: mix($brand-color,#fff,20%);
+	}
+}
+.tag-input__submit {
+	@extend .btn;
+}

@@ -1,0 +1,12 @@
+.show-more {
+	@extend .btn;
+	@extend .btn--quiet;
+	@include transition(all 0.2s ease);
+	@include transform(scale(1));
+	opacity: 1;
+	&.hidden,
+	.state-blank & {
+		opacity: 0;
+		@include transform(scale(0.5));
+	}
+}

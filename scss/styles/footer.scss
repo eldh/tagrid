@@ -1,0 +1,21 @@
+footer {
+	display: block;
+	position: absolute;
+	bottom: 0;
+	margin-bottom: 0;
+	left: 0;
+	text-align: center;
+	padding: 20px;
+	width: 100%;
+	background-color: #333;
+	color: #fff;
+	opacity: 0;
+	@include transition(all 2s ease-in);
+	.state-blank & {
+		opacity: 0;
+		@include transform(translateY(100%));
+	}
+	.state-album & {
+		opacity: 1;
+	}
+}
