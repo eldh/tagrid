@@ -30,3 +30,17 @@ p {
 .small {
 	font-size: 12px;
 }
+
+
+@media only all and (max-width: 370px) {
+	body {
+		font-size: 14px;
+	}
+	h1 {
+		font-size: 2rem;
+	}
+	p {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+}

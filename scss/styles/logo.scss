@@ -36,3 +36,11 @@
 		margin-right: -32px;		
 	}
 }
+@media only all and (max-width: 370px) {
+	.main-logo {
+		padding-top: 64px;
+		&:before {
+			font-size: 48px;
+		}
+	}
+}

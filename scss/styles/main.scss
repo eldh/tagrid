@@ -1,5 +1,5 @@
 * {
-	box-sizing: border-box;
+	@include prefixer(box-sizing, border-box, webkit moz spec);
 }
 
 html {

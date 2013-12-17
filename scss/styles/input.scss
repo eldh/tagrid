@@ -1,7 +1,11 @@
 .tag-input {
 	font-size: 1.375rem;
-	padding: 64px 0;
+	padding: 64px 20px;
 	font-weight: 400;
+	text-align: center;
+}
+.tag-input__input{
+	max-width: 80%;
 }
 .tag-input__input,
 .tag-input__submit  {
