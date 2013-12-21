@@ -456,7 +456,11 @@
         this.tagNameDisplay.innerHTML = this.tagName;
         this.input.value = '';
         this.setStateAlbum();
-        return this.getMedia();
+        this.getMedia();
+        return history.pushState({
+          name: 'album',
+          tagName: this.tagName
+        }, 'album');
       };
 
       Tagrid.prototype.request = function() {

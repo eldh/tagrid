@@ -86,6 +86,10 @@ window.onload = ->
 			@input.value = ''
 			do @setStateAlbum
 			do @getMedia
+			history.pushState 
+				name: 'album'
+				tagName: @tagName
+			, 'album'
 
 		request: ->
 			obj = 
