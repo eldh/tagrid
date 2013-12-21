@@ -19,7 +19,7 @@
 }
 .big-image__img {
 	position: absolute;
-	top: 0;
+	top: 50%;
 	left: 0;
 	right: 0;
 	margin: auto;
@@ -27,6 +27,7 @@
 	opacity: 0;
 	max-height: 100%;
 	max-width: 100%;
+	@include transform(translateY(-50%));
 	@include transition(opacity 2s ease);
 	&.loaded {
 		opacity: 1;
