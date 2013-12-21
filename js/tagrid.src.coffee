@@ -24,7 +24,7 @@ class Api
 
 	request: (options, callbackFunction) ->
 		return if @hasNoMorePages()
-		console.log options
+		# console.log options
 		options = options or {}
 		options.data = options.data or {}
 		currentUrl = @getUrl options
@@ -70,7 +70,7 @@ class FlickrApi extends Api
 		options.url = @urlBase + options.tagName + '&' + queryString
 
 	handleResponse: (response, wrapper) ->
-		console.log 'flickr response done', response
+		# console.log 'flickr response done', response
 		if response.stat is 'ok'
 			@updatePageNumber response.photos.page, response.photos.pages
 			for img in response.photos.photo
@@ -137,7 +137,7 @@ class InstagramApi extends Api
 		options.url
 
 	handleResponse: (response, wrapper) ->
-		console.log 'instagram response done', response
+		# console.log 'instagram response done', response
 		if response.meta.code is 400
 			console.log "no content"
 		else
@@ -187,7 +187,7 @@ class PxApi extends Api
 		options.url = @urlBase + options.tagName + '&' + queryString
 
 	handleResponse: (response, wrapper) ->
-		console.log 'px response done', response
+		# console.log 'px response done', response
 		if response.current_page
 			@updatePageNumber response.current_page, response.total_pages
 			for img in response.photos
@@ -258,9 +258,16 @@ window.onload = ->
 			@apis.px = new PxApi()
 			@tagName = window.location.hash.substr 1
 			if @tagName
+				history.pushState 
+					name: 'album'
+					tagName: @tagName
+				, 'album'
 				do @setStateAlbum
 				@getMedia @tagName
 			else
+				history.pushState
+					name: 'blank'
+				, 'blank'
 				do @setStateBlank
 
 		bindEvents:	->
@@ -268,6 +275,13 @@ window.onload = ->
 			$body.on 'click', '.show-more', @onShowMoreClicked
 			$body.on 'click', '.image', @onImageClicked
 			$(@form).on 'submit', @onFormSubmit
+			window.onpopstate = (event) =>
+				if event.state?.name is 'modal'
+					
+				else if event.state?.name is 'album'
+					do @modal.remove
+				else
+
 
 		getMedia: ->
 			@imagesWrapper.innerHTML = ''
@@ -286,6 +300,7 @@ window.onload = ->
 				images: $ '.image'
 				index: $(target).index()
 				element: target
+				tagName: @tagName
 
 		onShowMoreClicked: (event) =>
 			do event.preventDefault
@@ -352,6 +367,12 @@ class Modal
 		@currentIndex = options.index
 		@images = options.images
 		@maxIndex = options.images.length - 1
+
+		history.pushState
+			name: 'modal'
+			tagName: options.tagName
+		, 'modal'
+
 		unless @el = document.getElementById 'modal'
 			newModal = $ templates.modal()
 			$('body').append newModal
@@ -367,18 +388,17 @@ class Modal
 			disableScroll: true
 			callback: @onSwiped
 
-
 	bindEvents: ->
 		$(document).keyup (event) =>
 			if event.which is 27
-				do @remove
+				do history.back
 			else if event.which is 37
 				do @goToPrev
 			else if event.which is 39
 				do @goToNext
 		$el = $ @el
 		$el.on 'click', '.js-close', (event) =>
-			do @remove
+			do history.back
 		$el.on 'click', '.modal__arrow--left', (event) =>
 			do @goToPrev
 		$el.on 'click', '.modal__arrow--right', (event) =>
@@ -396,7 +416,7 @@ class Modal
 	insertElements: ->
 		@imagesWrapper.innerHTML = ''
 		for i in [0..4]
-			console.log @getRightNumber i
+			# console.log @getRightNumber i
 			imageEl = @createImage @getRightNumber i
 			frag = document.createElement 'div'
 			frag.id = 'bigImageWrapper'+i
@@ -453,11 +473,11 @@ class Modal
 		
 		# Set previous index and current
 		@currentIndex = parseInt $elem.find('.big-image').data 'index'
-		console.log '@currentIndex', @currentIndex
+		# console.log '@currentIndex', @currentIndex
 
 		# Are we going up or down
 		currentPosition = $elem.index()
-		console.log 'currentPosition', currentPosition
+		# console.log 'currentPosition', currentPosition
 
 		switchPositions = @getSwitchPositions currentPosition
 
@@ -472,10 +492,10 @@ class Modal
 		indices = ''
 		indices += el.dataset.index + '  ' for el in $(@imagesWrapper).find '.big-image'
 
-		console.log indices
-		console.log 'currentPosition', currentPosition
-		console.log "replacing "+switchPositions[0]+" with " +  switchIndices[0]
-		console.log "replacing "+switchPositions[1]+" with " +  switchIndices[1]
+		# console.log indices
+		# console.log 'currentPosition', currentPosition
+		# console.log "replacing "+switchPositions[0]+" with " +  switchIndices[0]
+		# console.log "replacing "+switchPositions[1]+" with " +  switchIndices[1]
 
 		switchElems[0].html @createImage switchIndices[0]
 		switchElems[1].html @createImage switchIndices[1]

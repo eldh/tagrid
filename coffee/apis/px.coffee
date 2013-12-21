@@ -18,7 +18,7 @@ class PxApi extends Api
 		options.url = @urlBase + options.tagName + '&' + queryString
 
 	handleResponse: (response, wrapper) ->
-		console.log 'px response done', response
+		# console.log 'px response done', response
 		if response.current_page
 			@updatePageNumber response.current_page, response.total_pages
 			for img in response.photos

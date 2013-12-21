@@ -29,9 +29,16 @@ window.onload = ->
 			@apis.px = new PxApi()
 			@tagName = window.location.hash.substr 1
 			if @tagName
+				history.pushState 
+					name: 'album'
+					tagName: @tagName
+				, 'album'
 				do @setStateAlbum
 				@getMedia @tagName
 			else
+				history.pushState
+					name: 'blank'
+				, 'blank'
 				do @setStateBlank
 
 		bindEvents:	->
@@ -39,6 +46,13 @@ window.onload = ->
 			$body.on 'click', '.show-more', @onShowMoreClicked
 			$body.on 'click', '.image', @onImageClicked
 			$(@form).on 'submit', @onFormSubmit
+			window.onpopstate = (event) =>
+				if event.state?.name is 'modal'
+					
+				else if event.state?.name is 'album'
+					do @modal.remove
+				else
+
 
 		getMedia: ->
 			@imagesWrapper.innerHTML = ''
@@ -57,6 +71,7 @@ window.onload = ->
 				images: $ '.image'
 				index: $(target).index()
 				element: target
+				tagName: @tagName
 
 		onShowMoreClicked: (event) =>
 			do event.preventDefault

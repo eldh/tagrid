@@ -13,7 +13,7 @@ class InstagramApi extends Api
 		options.url
 
 	handleResponse: (response, wrapper) ->
-		console.log 'instagram response done', response
+		# console.log 'instagram response done', response
 		if response.meta.code is 400
 			console.log "no content"
 		else

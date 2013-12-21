@@ -44,7 +44,6 @@
       if (this.hasNoMorePages()) {
         return;
       }
-      console.log(options);
       options = options || {};
       options.data = options.data || {};
       currentUrl = this.getUrl(options);
@@ -118,7 +117,6 @@
 
     FlickrApi.prototype.handleResponse = function(response, wrapper) {
       var img, obj, urlObjHi, urlObjLow, _i, _len, _ref1, _results;
-      console.log('flickr response done', response);
       if (response.stat === 'ok') {
         this.updatePageNumber(response.photos.page, response.photos.pages);
         _ref1 = response.photos.photo;
@@ -211,7 +209,6 @@
 
     InstagramApi.prototype.handleResponse = function(response, wrapper) {
       var img, obj, _i, _len, _ref2, _ref3, _ref4;
-      console.log('instagram response done', response);
       if (response.meta.code === 400) {
         console.log("no content");
       } else {
@@ -286,7 +283,6 @@
 
     PxApi.prototype.handleResponse = function(response, wrapper) {
       var hiUrl, img, lowUrl, obj, _i, _len, _ref3, _results;
-      console.log('px response done', response);
       if (response.current_page) {
         this.updatePageNumber(response.current_page, response.total_pages);
         _ref3 = response.photos;
@@ -392,19 +388,37 @@
         this.apis.px = new PxApi();
         this.tagName = window.location.hash.substr(1);
         if (this.tagName) {
+          history.pushState({
+            name: 'album',
+            tagName: this.tagName
+          }, 'album');
           this.setStateAlbum();
           return this.getMedia(this.tagName);
         } else {
+          history.pushState({
+            name: 'blank'
+          }, 'blank');
           return this.setStateBlank();
         }
       };
 
       Tagrid.prototype.bindEvents = function() {
-        var $body;
+        var $body,
+          _this = this;
         $body = $(this.body);
         $body.on('click', '.show-more', this.onShowMoreClicked);
         $body.on('click', '.image', this.onImageClicked);
-        return $(this.form).on('submit', this.onFormSubmit);
+        $(this.form).on('submit', this.onFormSubmit);
+        return window.onpopstate = function(event) {
+          var _ref3, _ref4;
+          if (((_ref3 = event.state) != null ? _ref3.name : void 0) === 'modal') {
+
+          } else if (((_ref4 = event.state) != null ? _ref4.name : void 0) === 'album') {
+            return _this.modal.remove();
+          } else {
+
+          }
+        };
       };
 
       Tagrid.prototype.getMedia = function() {
@@ -424,7 +438,8 @@
         return this.modal.init({
           images: $('.image'),
           index: $(target).index(),
-          element: target
+          element: target,
+          tagName: this.tagName
         });
       };
 
@@ -517,6 +532,10 @@
       this.currentIndex = options.index;
       this.images = options.images;
       this.maxIndex = options.images.length - 1;
+      history.pushState({
+        name: 'modal',
+        tagName: options.tagName
+      }, 'modal');
       if (!(this.el = document.getElementById('modal'))) {
         newModal = $(templates.modal());
         $('body').append(newModal);
@@ -537,7 +556,7 @@
         _this = this;
       $(document).keyup(function(event) {
         if (event.which === 27) {
-          return _this.remove();
+          return history.back();
         } else if (event.which === 37) {
           return _this.goToPrev();
         } else if (event.which === 39) {
@@ -546,7 +565,7 @@
       });
       $el = $(this.el);
       $el.on('click', '.js-close', function(event) {
-        return _this.remove();
+        return history.back();
       });
       $el.on('click', '.modal__arrow--left', function(event) {
         return _this.goToPrev();
@@ -573,7 +592,6 @@
       this.imagesWrapper.innerHTML = '';
       _results = [];
       for (i = _i = 0; _i <= 4; i = ++_i) {
-        console.log(this.getRightNumber(i));
         imageEl = this.createImage(this.getRightNumber(i));
         frag = document.createElement('div');
         frag.id = 'bigImageWrapper' + i;
@@ -643,9 +661,7 @@
       var $elem, currentPosition, el, indices, switchElems, switchIndices, switchPositions, _i, _len, _ref3;
       $elem = $(elem);
       this.currentIndex = parseInt($elem.find('.big-image').data('index'));
-      console.log('@currentIndex', this.currentIndex);
       currentPosition = $elem.index();
-      console.log('currentPosition', currentPosition);
       switchPositions = this.getSwitchPositions(currentPosition);
       switchIndices = [];
       switchIndices[0] = this.prevIndex(this.prevIndex(this.currentIndex));
@@ -659,10 +675,6 @@
         el = _ref3[_i];
         indices += el.dataset.index + '  ';
       }
-      console.log(indices);
-      console.log('currentPosition', currentPosition);
-      console.log("replacing " + switchPositions[0] + " with " + switchIndices[0]);
-      console.log("replacing " + switchPositions[1] + " with " + switchIndices[1]);
       switchElems[0].html(this.createImage(switchIndices[0]));
       return switchElems[1].html(this.createImage(switchIndices[1]));
     };

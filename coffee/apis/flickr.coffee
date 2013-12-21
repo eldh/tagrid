@@ -14,7 +14,7 @@ class FlickrApi extends Api
 		options.url = @urlBase + options.tagName + '&' + queryString
 
 	handleResponse: (response, wrapper) ->
-		console.log 'flickr response done', response
+		# console.log 'flickr response done', response
 		if response.stat is 'ok'
 			@updatePageNumber response.photos.page, response.photos.pages
 			for img in response.photos.photo

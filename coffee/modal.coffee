@@ -12,6 +12,12 @@ class Modal
 		@currentIndex = options.index
 		@images = options.images
 		@maxIndex = options.images.length - 1
+
+		history.pushState
+			name: 'modal'
+			tagName: options.tagName
+		, 'modal'
+
 		unless @el = document.getElementById 'modal'
 			newModal = $ templates.modal()
 			$('body').append newModal
@@ -27,18 +33,17 @@ class Modal
 			disableScroll: true
 			callback: @onSwiped
 
-
 	bindEvents: ->
 		$(document).keyup (event) =>
 			if event.which is 27
-				do @remove
+				do history.back
 			else if event.which is 37
 				do @goToPrev
 			else if event.which is 39
 				do @goToNext
 		$el = $ @el
 		$el.on 'click', '.js-close', (event) =>
-			do @remove
+			do history.back
 		$el.on 'click', '.modal__arrow--left', (event) =>
 			do @goToPrev
 		$el.on 'click', '.modal__arrow--right', (event) =>
@@ -56,7 +61,7 @@ class Modal
 	insertElements: ->
 		@imagesWrapper.innerHTML = ''
 		for i in [0..4]
-			console.log @getRightNumber i
+			# console.log @getRightNumber i
 			imageEl = @createImage @getRightNumber i
 			frag = document.createElement 'div'
 			frag.id = 'bigImageWrapper'+i
@@ -113,11 +118,11 @@ class Modal
 		
 		# Set previous index and current
 		@currentIndex = parseInt $elem.find('.big-image').data 'index'
-		console.log '@currentIndex', @currentIndex
+		# console.log '@currentIndex', @currentIndex
 
 		# Are we going up or down
 		currentPosition = $elem.index()
-		console.log 'currentPosition', currentPosition
+		# console.log 'currentPosition', currentPosition
 
 		switchPositions = @getSwitchPositions currentPosition
 
@@ -132,10 +137,10 @@ class Modal
 		indices = ''
 		indices += el.dataset.index + '  ' for el in $(@imagesWrapper).find '.big-image'
 
-		console.log indices
-		console.log 'currentPosition', currentPosition
-		console.log "replacing "+switchPositions[0]+" with " +  switchIndices[0]
-		console.log "replacing "+switchPositions[1]+" with " +  switchIndices[1]
+		# console.log indices
+		# console.log 'currentPosition', currentPosition
+		# console.log "replacing "+switchPositions[0]+" with " +  switchIndices[0]
+		# console.log "replacing "+switchPositions[1]+" with " +  switchIndices[1]
 
 		switchElems[0].html @createImage switchIndices[0]
 		switchElems[1].html @createImage switchIndices[1]

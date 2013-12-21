@@ -24,7 +24,7 @@ class Api
 
 	request: (options, callbackFunction) ->
 		return if @hasNoMorePages()
-		console.log options
+		# console.log options
 		options = options or {}
 		options.data = options.data or {}
 		currentUrl = @getUrl options
