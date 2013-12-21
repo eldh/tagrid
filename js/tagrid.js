@@ -510,34 +510,26 @@
 
     Modal.prototype.currentIndex = void 0;
 
+    Modal.prototype.maxIndex = void 0;
+
     Modal.prototype.init = function(options) {
-      var htmlString, img, newModal, _i, _len, _ref3;
+      var newModal;
       this.currentIndex = options.index;
+      this.images = options.images;
+      this.maxIndex = options.images.length - 1;
       if (!(this.el = document.getElementById('modal'))) {
         newModal = $(templates.modal());
         $('body').append(newModal);
         this.el = document.getElementById('modal');
         this.imagesWrapper = document.getElementById('modal-content');
       }
-      this.imagesWrapper.innerHTML = '';
-      htmlString = '';
-      _ref3 = options.images;
-      for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
-        img = _ref3[_i];
-        htmlString += this.createImage(img);
-      }
-      this.imagesWrapper.innerHTML = htmlString;
-      this.swipe = Swipe(document.getElementById('swipe'), {
-        startSlide: this.currentIndex,
+      this.insertElements();
+      this.bindEvents();
+      return this.swipe = Swipe(document.getElementById('swipe'), {
+        startSlide: 2,
         disableScroll: true,
         callback: this.onSwiped
       });
-      this.swipe.slide(this.currentIndex);
-      this.images = $(this.imagesWrapper).find('.big-image');
-      this.loadImage(this.currentIndex);
-      this.loadImage(this.currentIndex - 1);
-      this.loadImage(this.currentIndex + 1);
-      return this.bindEvents();
     };
 
     Modal.prototype.bindEvents = function() {
@@ -569,29 +561,71 @@
     };
 
     Modal.prototype.goToNext = function() {
-      this.swipe.next();
-      this.currentIndex++;
-      return this.loadImage(this.currentIndex + 1);
+      return this.swipe.next();
     };
 
     Modal.prototype.goToPrev = function() {
-      this.swipe.prev();
-      this.currentIndex--;
-      return this.loadImage(this.currentIndex - 1);
+      return this.swipe.prev();
     };
 
-    Modal.prototype.loadImage = function(index) {
-      var image, url;
-      image = this.images.eq(index).find('.js-bigimg');
-      if (image.attr('src') === image.attr('data-src')) {
-        return;
+    Modal.prototype.insertElements = function() {
+      var frag, i, imageEl, _i, _results;
+      this.imagesWrapper.innerHTML = '';
+      _results = [];
+      for (i = _i = 0; _i <= 4; i = ++_i) {
+        console.log(this.getRightNumber(i));
+        imageEl = this.createImage(this.getRightNumber(i));
+        frag = document.createElement('div');
+        frag.id = 'bigImageWrapper' + i;
+        frag.classList.add('big-image-wrapper');
+        frag.dataset.index = this.getRightNumber(i);
+        frag.innerHTML = imageEl;
+        _results.push(this.imagesWrapper.appendChild(frag));
       }
-      url = image.attr('data-src');
-      return image.attr('src', url);
+      return _results;
     };
 
-    Modal.prototype.createImage = function(element) {
-      var bigImage, data;
+    Modal.prototype.getRightNumber = function(i) {
+      if (i === 0) {
+        return this.prevIndex(this.prevIndex(this.currentIndex));
+      } else if (i === 1) {
+        return this.prevIndex(this.currentIndex);
+      } else if (i === 2) {
+        return this.currentIndex;
+      } else if (i === 3) {
+        return this.nextIndex(this.currentIndex);
+      } else if (i === 4) {
+        return this.nextIndex(this.nextIndex(this.currentIndex));
+      }
+    };
+
+    Modal.prototype.currentIndexUp = function() {
+      return this.currentIndex = this.nextIndex();
+    };
+
+    Modal.prototype.currentIndexDown = function() {
+      return this.currentIndex = this.prevIndex();
+    };
+
+    Modal.prototype.nextIndex = function(index) {
+      if (index === this.maxIndex) {
+        return 0;
+      } else {
+        return index + 1;
+      }
+    };
+
+    Modal.prototype.prevIndex = function(index) {
+      if (index === 0) {
+        return this.maxIndex;
+      } else {
+        return index - 1;
+      }
+    };
+
+    Modal.prototype.createImage = function(index) {
+      var bigImage, data, element;
+      element = this.images[index];
       data = element.dataset;
       bigImage = templates.bigimage({
         id: element.id,
@@ -599,14 +633,52 @@
         original: data.original,
         alt: data.caption,
         caption: data.caption,
-        service: data.service
+        service: data.service,
+        index: index
       });
       return bigImage;
     };
 
     Modal.prototype.onSwiped = function(index, elem) {
-      this.loadImage(index + 1);
-      return this.loadImage(index - 1);
+      var $elem, currentPosition, el, indices, switchElems, switchIndices, switchPositions, _i, _len, _ref3;
+      $elem = $(elem);
+      this.currentIndex = parseInt($elem.find('.big-image').data('index'));
+      console.log('@currentIndex', this.currentIndex);
+      currentPosition = $elem.index();
+      console.log('currentPosition', currentPosition);
+      switchPositions = this.getSwitchPositions(currentPosition);
+      switchIndices = [];
+      switchIndices[0] = this.prevIndex(this.prevIndex(this.currentIndex));
+      switchIndices[1] = this.nextIndex(this.nextIndex(this.currentIndex));
+      switchElems = [];
+      switchElems[0] = $('#bigImageWrapper' + switchPositions[0]);
+      switchElems[1] = $('#bigImageWrapper' + switchPositions[1]);
+      indices = '';
+      _ref3 = $(this.imagesWrapper).find('.big-image');
+      for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
+        el = _ref3[_i];
+        indices += el.dataset.index + '  ';
+      }
+      console.log(indices);
+      console.log('currentPosition', currentPosition);
+      console.log("replacing " + switchPositions[0] + " with " + switchIndices[0]);
+      console.log("replacing " + switchPositions[1] + " with " + switchIndices[1]);
+      switchElems[0].html(this.createImage(switchIndices[0]));
+      return switchElems[1].html(this.createImage(switchIndices[1]));
+    };
+
+    Modal.prototype.getSwitchPositions = function(position) {
+      if (position === 4) {
+        return [2, 1];
+      } else if (position === 3) {
+        return [1, 0];
+      } else if (position === 2) {
+        return [0, 4];
+      } else if (position === 1) {
+        return [4, 3];
+      } else if (position === 0) {
+        return [3, 2];
+      }
     };
 
     return Modal;
