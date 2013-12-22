@@ -484,7 +484,7 @@
       };
 
       Tagrid.prototype.setStateAlbum = function() {
-        this.tagNameDisplay.innerHTML = this.tagName;
+        this.tagNameDisplay.innerHTML = decodeURIComponent(this.tagName);
         $(this.inputWrapper).hide();
         $(this.body).addClass('state-album');
         return $(this.body).removeClass('state-blank');

@@ -335,7 +335,7 @@ window.onload = ->
 					$(@showMoreLink).removeClass 'hidden'
 
 		setStateAlbum: ->
-			@tagNameDisplay.innerHTML = @tagName
+			@tagNameDisplay.innerHTML = decodeURIComponent @tagName
 			do $(@inputWrapper).hide
 			$(@body).addClass 'state-album'
 			$(@body).removeClass 'state-blank'
