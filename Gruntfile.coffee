@@ -82,7 +82,7 @@ module.exports = (grunt) ->
       server:
         path: "http://localhost:<%= connect.server.options.port %>/"
 
-  grunt.loadNpmTasks "grunt-contrib-sass"
+  grunt.loadNpmTasks "grunt-sass"
   grunt.loadNpmTasks "grunt-contrib-coffee"
   grunt.loadNpmTasks "grunt-contrib-watch"
   grunt.loadNpmTasks "grunt-contrib-concat"

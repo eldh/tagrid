@@ -40,7 +40,7 @@ class FlickrApi extends Api
 				@createImage obj, wrapper
 
 	getImageUrl: (obj) ->
-		'http://farm'+obj.farm+'.staticflickr.com/'+obj.server+'/'+obj.id+'_'+obj.secret+'_'+obj.size+'.jpg'
+		'http://farm#{obj.farm}.staticflickr.com/#{obj.server}/#{obj.id}_#{obj.secret}_#{obj.size}.jpg'
 
 	createImage: (obj, wrapper) ->
 		newImage = $ templates.image

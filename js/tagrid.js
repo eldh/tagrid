@@ -1,5 +1,5 @@
 (function() {
-  var Api, FlickrApi, InstagramApi, Modal, PxApi, _ref, _ref1, _ref2,
+  var Api, FlickrApi, InstagramApi, Modal, PxApi, TwitterApi, _ref, _ref1, _ref2, _ref3,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -148,7 +148,7 @@
     };
 
     FlickrApi.prototype.getImageUrl = function(obj) {
-      return 'http://farm' + obj.farm + '.staticflickr.com/' + obj.server + '/' + obj.id + '_' + obj.secret + '_' + obj.size + '.jpg';
+      return 'http://farm#{obj.farm}.staticflickr.com/#{obj.server}/#{obj.id}_#{obj.secret}_#{obj.size}.jpg';
     };
 
     FlickrApi.prototype.createImage = function(obj, wrapper) {
@@ -340,6 +340,75 @@
 
   })(Api);
 
+  TwitterApi = (function(_super) {
+    __extends(TwitterApi, _super);
+
+    function TwitterApi() {
+      _ref3 = TwitterApi.__super__.constructor.apply(this, arguments);
+      return _ref3;
+    }
+
+    TwitterApi.prototype.clientId = 'a0f68c5728b94e54a15103a6edd6c5f7';
+
+    TwitterApi.prototype.urlBase = 'https://api.twitter.com/1.1/search/tweets.json';
+
+    TwitterApi.prototype.nextTagId = void 0;
+
+    TwitterApi.prototype.getUrl = function(options) {
+      var queryString;
+      options.data.client_id = this.clientId;
+      options.data.max_tag_id = this.nextTagId;
+      queryString = this.serializeParams(options.data);
+      options.url = this.urlBase + 'tags/' + options.tagName + '/media/recent' + "?" + queryString;
+      return options.url;
+    };
+
+    TwitterApi.prototype.handleResponse = function(response, wrapper) {
+      var img, obj, _i, _len, _ref4, _ref5, _ref6;
+      if (response.meta.code === 400) {
+        console.log("no content");
+      } else {
+        _ref4 = response.data;
+        for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
+          img = _ref4[_i];
+          obj = {
+            urls: {
+              low: img.images.low_resolution.url,
+              hi: img.images.standard_resolution.url,
+              original: img.link
+            },
+            caption: (_ref5 = img.caption) != null ? _ref5.text : void 0,
+            id: img.id
+          };
+          this.createImage(obj, wrapper);
+        }
+      }
+      return this.nextTagId = ((_ref6 = response.pagination) != null ? _ref6.next_max_tag_id : void 0) || null;
+    };
+
+    TwitterApi.prototype.createImage = function(obj, wrapper) {
+      var newImage;
+      newImage = $(templates.image({
+        id: obj.id,
+        urls: obj.urls,
+        caption: obj.caption,
+        service: "instagram"
+      }));
+      return wrapper.appendChild(newImage[0]);
+    };
+
+    TwitterApi.prototype.hasNoMorePages = function() {
+      return this.nextTagId === null;
+    };
+
+    TwitterApi.prototype.reset = function() {
+      return this.nextTagId = void 0;
+    };
+
+    return TwitterApi;
+
+  })(Api);
+
   window.onload = function() {
     var Tagrid, tagrid;
     Tagrid = (function() {
@@ -384,8 +453,6 @@
       Tagrid.prototype.init = function() {
         this.bindEvents();
         this.apis.instagram = new InstagramApi();
-        this.apis.flickr = new FlickrApi();
-        this.apis.px = new PxApi();
         this.tagName = window.location.hash.substr(1);
         if (this.tagName) {
           history.pushState({
@@ -410,10 +477,10 @@
         $body.on('click', '.image', this.onImageClicked);
         $(this.form).on('submit', this.onFormSubmit);
         return window.onpopstate = function(event) {
-          var _ref3, _ref4;
-          if (((_ref3 = event.state) != null ? _ref3.name : void 0) === 'modal') {
+          var _ref4, _ref5;
+          if (((_ref4 = event.state) != null ? _ref4.name : void 0) === 'modal') {
 
-          } else if (((_ref4 = event.state) != null ? _ref4.name : void 0) === 'album') {
+          } else if (((_ref5 = event.state) != null ? _ref5.name : void 0) === 'album') {
             return _this.modal.remove();
           } else {
 
@@ -427,7 +494,7 @@
       };
 
       Tagrid.prototype.hasNoMorePages = function() {
-        return this.apis.instagram.hasNoMorePages() && this.apis.flickr.hasNoMorePages() && this.apis.px.hasNoMorePages();
+        return this.apis.instagram.hasNoMorePages();
       };
 
       Tagrid.prototype.onImageClicked = function(event) {
@@ -464,16 +531,14 @@
       };
 
       Tagrid.prototype.request = function() {
-        var flickrReq, instaReq, obj, pxReq,
+        var instaReq, obj,
           _this = this;
         obj = {
           tagName: this.tagName,
           wrapper: this.imagesWrapper
         };
         instaReq = this.apis.instagram.request(this.clone(obj));
-        flickrReq = this.apis.flickr.request(this.clone(obj));
-        pxReq = this.apis.px.request(this.clone(obj));
-        return $.when(instaReq, flickrReq, pxReq).always(function(instaReq, flickrReq, pxReq) {
+        return $.when(instaReq).always(function(instaReq) {
           if (_this.hasNoMorePages()) {
             $(_this.showMoreLink).addClass('hidden');
             return _this.resetApis();
@@ -498,9 +563,7 @@
       };
 
       Tagrid.prototype.resetApis = function() {
-        this.apis.instagram.reset();
-        this.apis.flickr.reset();
-        return this.apis.px.reset();
+        return this.apis.instagram.reset();
       };
 
       Tagrid.prototype.clone = function(obj) {
@@ -574,8 +637,11 @@
       $el.on('click', '.modal__arrow--left', function(event) {
         return _this.goToPrev();
       });
-      return $el.on('click', '.modal__arrow--right', function(event) {
+      $el.on('click', '.modal__arrow--right', function(event) {
         return _this.goToNext();
+      });
+      return $('.big-image').click(function(e) {
+        return $(this).find('.big-image__caption').toggleClass('big-image__caption--visible');
       });
     };
 
@@ -662,7 +728,7 @@
     };
 
     Modal.prototype.onSwiped = function(index, elem) {
-      var $elem, currentPosition, el, indices, switchElems, switchIndices, switchPositions, _i, _len, _ref3;
+      var $elem, currentPosition, el, indices, switchElems, switchIndices, switchPositions, _i, _len, _ref4;
       $elem = $(elem);
       this.currentIndex = parseInt($elem.find('.big-image').data('index'));
       currentPosition = $elem.index();
@@ -674,9 +740,9 @@
       switchElems[0] = $('#bigImageWrapper' + switchPositions[0]);
       switchElems[1] = $('#bigImageWrapper' + switchPositions[1]);
       indices = '';
-      _ref3 = $(this.imagesWrapper).find('.big-image');
-      for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
-        el = _ref3[_i];
+      _ref4 = $(this.imagesWrapper).find('.big-image');
+      for (_i = 0, _len = _ref4.length; _i < _len; _i++) {
+        el = _ref4[_i];
         indices += el.dataset.index + '  ';
       }
       switchElems[0].html(this.createImage(switchIndices[0]));

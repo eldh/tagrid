@@ -13,7 +13,7 @@
 	height: 100%;
 	width: 100%;
 	margin: 0;
-	padding: 20px;
+	// padding: 20px;
 	color: #fff;
 	@include clearfix;
 }
@@ -23,7 +23,7 @@
 	left: 0;
 	right: 0;
 	margin: auto;
-	padding: 50px 5px;
+	// padding: 50px 5px;
 	opacity: 0;
 	max-height: 100%;
 	max-width: 100%;
@@ -44,11 +44,17 @@
 }
 .big-image__caption {
 	display: block;
-	width: 100%;
+	width: calc(100%-20px);
+	margin-left: 30px; // Adjust  for big image margin.
 	color: #fff;
+	overflow-x: hidden;
 	white-space: nowrap;
-	overflow: hidden;
 	text-overflow: ellipsis;
+	margin-bottom: -30px;
+	@include transition(margin 0.25s ease);
+}
+.big-image__caption--visible {
+	margin-bottom: 0px;
 }
 .big-image__original {
 	padding-bottom: 5px;

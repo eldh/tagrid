@@ -25,8 +25,8 @@ window.onload = ->
 		init: ->
 			do @bindEvents
 			@apis.instagram = new InstagramApi()
-			@apis.flickr = new FlickrApi()
-			@apis.px = new PxApi()
+			# @apis.flickr = new FlickrApi()
+			# @apis.px = new PxApi()
 			@tagName = window.location.hash.substr 1
 			if @tagName
 				history.pushState 
@@ -59,9 +59,9 @@ window.onload = ->
 			do @request
 
 		hasNoMorePages: ->
-			do @apis.instagram.hasNoMorePages and
-			do @apis.flickr.hasNoMorePages and
-			do @apis.px.hasNoMorePages
+			do @apis.instagram.hasNoMorePages # and
+			# do @apis.flickr.hasNoMorePages and
+			# do @apis.px.hasNoMorePages
 
 		onImageClicked: (event) =>
 			do event.stopPropagation
@@ -96,9 +96,10 @@ window.onload = ->
 				tagName: @tagName
 				wrapper: @imagesWrapper
 			instaReq = @apis.instagram.request @clone obj
-			flickrReq = @apis.flickr.request @clone obj
-			pxReq = @apis.px.request @clone obj
-			$.when(instaReq, flickrReq, pxReq).always (instaReq, flickrReq, pxReq) =>
+			# flickrReq = @apis.flickr.request @clone obj
+			# pxReq = @apis.px.request @clone obj
+			# $.when(instaReq, flickrReq, pxReq).always (instaReq, flickrReq, pxReq) =>
+			$.when(instaReq).always (instaReq) =>
 				if do @hasNoMorePages
 					$(@showMoreLink).addClass 'hidden'
 					do @resetApis
@@ -120,8 +121,8 @@ window.onload = ->
 
 		resetApis: ->
 			do @apis.instagram.reset
-			do @apis.flickr.reset
-			do @apis.px.reset
+			# do @apis.flickr.reset
+			# do @apis.px.reset
 
 		clone: (obj) ->
 			$.extend true, {}, obj

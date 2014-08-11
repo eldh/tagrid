@@ -96,7 +96,7 @@ class FlickrApi extends Api
 				@createImage obj, wrapper
 
 	getImageUrl: (obj) ->
-		'http://farm'+obj.farm+'.staticflickr.com/'+obj.server+'/'+obj.id+'_'+obj.secret+'_'+obj.size+'.jpg'
+		'http://farm#{obj.farm}.staticflickr.com/#{obj.server}/#{obj.id}_#{obj.secret}_#{obj.size}.jpg'
 
 	createImage: (obj, wrapper) ->
 		newImage = $ templates.image
@@ -227,6 +227,51 @@ class PxApi extends Api
 		@pages = undefined
 
 
+class TwitterApi extends Api
+
+	clientId: 'a0f68c5728b94e54a15103a6edd6c5f7'
+	urlBase: 'https://api.twitter.com/1.1/search/tweets.json'
+
+	nextTagId: undefined
+
+	getUrl: (options) ->
+		options.data.client_id = @clientId
+		options.data.max_tag_id = @nextTagId
+		queryString = @serializeParams options.data
+		options.url = @urlBase + 'tags/' + options.tagName + '/media/recent' + "?" + queryString
+		options.url
+
+	handleResponse: (response, wrapper) ->
+		# console.log 'instagram response done', response
+		if response.meta.code is 400
+			console.log "no content"
+		else
+			for img in response.data
+				obj = 
+					urls: 
+						low: img.images.low_resolution.url
+						hi: img.images.standard_resolution.url
+						original: img.link
+					caption: img.caption?.text
+					id: img.id
+				@createImage obj, wrapper
+
+		@nextTagId = response.pagination?.next_max_tag_id or null
+
+	createImage: (obj, wrapper) ->
+		newImage = $ templates.image
+			id: obj.id
+			urls: obj.urls
+			caption: obj.caption
+			service: "instagram"
+		wrapper.appendChild newImage[0]
+
+	hasNoMorePages: ->
+		return @nextTagId is null
+
+	reset: ->
+		@nextTagId = undefined
+
 window.onload = ->
 	class Tagrid
 		
@@ -254,8 +299,8 @@ window.onload = ->
 		init: ->
 			do @bindEvents
 			@apis.instagram = new InstagramApi()
-			@apis.flickr = new FlickrApi()
-			@apis.px = new PxApi()
+			# @apis.flickr = new FlickrApi()
+			# @apis.px = new PxApi()
 			@tagName = window.location.hash.substr 1
 			if @tagName
 				history.pushState 
@@ -288,9 +333,9 @@ window.onload = ->
 			do @request
 
 		hasNoMorePages: ->
-			do @apis.instagram.hasNoMorePages and
-			do @apis.flickr.hasNoMorePages and
-			do @apis.px.hasNoMorePages
+			do @apis.instagram.hasNoMorePages # and
+			# do @apis.flickr.hasNoMorePages and
+			# do @apis.px.hasNoMorePages
 
 		onImageClicked: (event) =>
 			do event.stopPropagation
@@ -325,9 +370,10 @@ window.onload = ->
 				tagName: @tagName
 				wrapper: @imagesWrapper
 			instaReq = @apis.instagram.request @clone obj
-			flickrReq = @apis.flickr.request @clone obj
-			pxReq = @apis.px.request @clone obj
-			$.when(instaReq, flickrReq, pxReq).always (instaReq, flickrReq, pxReq) =>
+			# flickrReq = @apis.flickr.request @clone obj
+			# pxReq = @apis.px.request @clone obj
+			# $.when(instaReq, flickrReq, pxReq).always (instaReq, flickrReq, pxReq) =>
+			$.when(instaReq).always (instaReq) =>
 				if do @hasNoMorePages
 					$(@showMoreLink).addClass 'hidden'
 					do @resetApis
@@ -349,8 +395,8 @@ window.onload = ->
 
 		resetApis: ->
 			do @apis.instagram.reset
-			do @apis.flickr.reset
-			do @apis.px.reset
+			# do @apis.flickr.reset
+			# do @apis.px.reset
 
 		clone: (obj) ->
 			$.extend true, {}, obj
@@ -401,12 +447,14 @@ class Modal
 			else if event.which is 39
 				do @goToNext
 		$el = $ @el
-		$el.on 'click', '.js-close', (event) =>
+		$el.on 'click', '.js-close', (event) ->
 			do history.back
 		$el.on 'click', '.modal__arrow--left', (event) =>
 			do @goToPrev
 		$el.on 'click', '.modal__arrow--right', (event) =>
 			do @goToNext
+		$('.big-image').click (e) ->
+			$(this).find('.big-image__caption').toggleClass('big-image__caption--visible')
 
 	remove: ->
 		do @el.remove
@@ -495,11 +543,6 @@ class Modal
 
 		indices = ''
 		indices += el.dataset.index + '  ' for el in $(@imagesWrapper).find '.big-image'
-
-		# console.log indices
-		# console.log 'currentPosition', currentPosition
-		# console.log "replacing "+switchPositions[0]+" with " +  switchIndices[0]
-		# console.log "replacing "+switchPositions[1]+" with " +  switchIndices[1]
 
 		switchElems[0].html @createImage switchIndices[0]
 		switchElems[1].html @createImage switchIndices[1]

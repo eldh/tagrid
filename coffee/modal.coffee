@@ -42,12 +42,14 @@ class Modal
 			else if event.which is 39
 				do @goToNext
 		$el = $ @el
-		$el.on 'click', '.js-close', (event) =>
+		$el.on 'click', '.js-close', (event) ->
 			do history.back
 		$el.on 'click', '.modal__arrow--left', (event) =>
 			do @goToPrev
 		$el.on 'click', '.modal__arrow--right', (event) =>
 			do @goToNext
+		$('.big-image').click (e) ->
+			$(this).find('.big-image__caption').toggleClass('big-image__caption--visible')
 
 	remove: ->
 		do @el.remove
@@ -136,11 +138,6 @@ class Modal
 
 		indices = ''
 		indices += el.dataset.index + '  ' for el in $(@imagesWrapper).find '.big-image'
-
-		# console.log indices
-		# console.log 'currentPosition', currentPosition
-		# console.log "replacing "+switchPositions[0]+" with " +  switchIndices[0]
-		# console.log "replacing "+switchPositions[1]+" with " +  switchIndices[1]
 
 		switchElems[0].html @createImage switchIndices[0]
 		switchElems[1].html @createImage switchIndices[1]

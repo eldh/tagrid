@@ -17,10 +17,7 @@ body {
 	&.scrolling {
 		pointer-events: none;
 	}
-	&.state-album {
-	}
-	&.state-blank {
-	}
+
 	&.state-album,
 	&.state-blank {
 		opacity: 1;
@@ -36,6 +33,7 @@ body {
 .state-blank .wrapper {
 	padding-bottom: 20px;
 }
-a, a:link {
+a,
+a:link {
 	text-decoration: none;
 }
